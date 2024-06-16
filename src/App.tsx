@@ -1,4 +1,3 @@
-import PayTokenFunctionCall from "./dApps/PayTokenFunctionCall";
 import TransferCUSD from "./dApps/TransferCUSD";
 
 export default function App() {
