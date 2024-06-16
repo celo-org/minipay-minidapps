@@ -64,8 +64,7 @@ export default function TransferCUSD() {
                 onClick={transferCUSD} 
                 style={{ 
                     marginBottom: "10px", 
-                    borderRadius: "10px",
-                    padding: "5px", 
+                    borderRadius: "10px", 
                     border: "1px solid green",
                     color: "green",
                 }}
