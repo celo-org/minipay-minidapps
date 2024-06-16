@@ -56,7 +56,7 @@ export default function TransferCUSD() {
                     borderRadius: "10px",
                     padding: "5px",
                     width: "200px",
-                    border: "1px solid grey",
+                    border: "2px solid green",
                 }}
             />
             <button 
@@ -66,7 +66,10 @@ export default function TransferCUSD() {
                     marginBottom: "10px", 
                     borderRadius: "10px", 
                     border: "1px solid green",
-                    color: "green",
+                    backgroundColor: "green",
+                    color: "white",
+                    padding: "5px",
+                    width: "200px",
                 }}
             >
                 Transfer cUSD
