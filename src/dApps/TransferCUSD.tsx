@@ -1,48 +1,76 @@
-import { utils } from "ethers";
+import React, { useState } from 'react';
+import { utils } from 'ethers';
 
 // Mainnet address of cUSD
 const CUSD_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 
-const receiverAddress = "";
+// Dummy receiver address for demo purpose
+const receiverAddress = "0xFEeEB43FFC9f947413009864d00Ccf9B9146A55d";
 
-// DApp to quickly test transfer of cUSD to a specific address using the cUSD contract.
-export default function TransferCUSD() {
-    async function transferCUSD() {
-        if (window.ethereum) {
-            // Get connected accounts, if not connected request connnection.
-            // returns an array of accounts
+// MiniPay specific functionality and state management
+const TransferCUSD = ({ }) => {
+    const [transactionStatus, setTransactionStatus] = useState('');
+
+    // Function to initiate the transfer of cUSD
+    const transferCUSD = async () => {
+        try {
+            if (!window.ethereum) {
+                throw new Error('MetaMask or another Web3 provider is not installed');
+            }
+
+            // Request user's Ethereum accounts
             let accounts = await window.ethereum.request({
-                method: "eth_requestAccounts",
+                method: 'eth_requestAccounts',
             });
-
-            // The current selected account out of the connected accounts.
             let userAddress = accounts[0];
 
+            // Prepare the transaction data
             let iface = new utils.Interface([
                 "function transfer(address to, uint256 value)",
             ]);
-
-            let calldata = iface.encodeFunctionData("transfer", [
+            const calldata = iface.encodeFunctionData("transfer", [
                 receiverAddress,
                 utils.parseEther("0.1"), // 10 cUSD - This amount is in wei
             ]);
 
-            // Send transaction to the injected wallet to be confirmed by the user.
+            // Send transaction to the cUSD contract
             let tx = await window.ethereum.request({
-                method: "eth_sendTransaction",
+                method: 'eth_sendTransaction',
                 params: [
                     {
                         from: userAddress,
-                        to: CUSD_ADDRESS, // We need to call the transfer function on the cUSD token contract
-                        data: calldata, // Information about which function to call and what values to pass as parameters
+                        to: CUSD_ADDRESS,
+                        data: calldata,
                     },
                 ],
             });
 
-            // Wait until tx confirmation and get tx receipt
-            let receipt = await tx.wait();
+            // Update transaction status
+            setTransactionStatus(`Transaction sent: ${tx.hash}`);
+            
+            // Wait for transaction confirmation and get receipt
+            const receipt = await tx.wait();
+            setTransactionStatus(`Transaction confirmed: ${receipt.transactionHash}`);
+            
+            // Optionally: Update MiniPay's internal state or notify the user
+        } catch (error) {
+            console.error('Error occurred during transaction:', error);
+            // Check if error is an instance of Error and has a message property
+            if (error instanceof Error) {
+                setTransactionStatus(`Transaction failed: ${error.message}`);
+            } else {
+                // Handle cases where error is not an Error object
+                setTransactionStatus('Transaction failed: An unknown error occurred');
+            }
         }
-    }
+    };
 
-    return <button onClick={transferCUSD}>Transfer cUSD</button>;
-}
+    return (
+        <div>
+            <button onClick={transferCUSD}>Transfer 0.1 cUSD</button>
+            {transactionStatus && <p>{transactionStatus}</p>}
+        </div>
+    );
+};
+
+export default TransferCUSD;
