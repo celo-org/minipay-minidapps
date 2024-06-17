@@ -23,15 +23,25 @@ export default function TransferCUSD() {
             setUserAddress(accounts[0]);
 
             const provider = new ethers.providers.Web3Provider(ethereum);
-            const signer = provider.getSigner();
+            
 
             const cUSDContract = new ethers.Contract(
                 CUSD_ADDRESS,
-                ["function transfer(address to, uint256 value)"],
-                signer
+                ["function balanceOf(address account) view returns (uint256)"],
+                provider
             );
+            
+            const balance = await cUSDContract.balanceOf(accounts[0]);
+            const transferAmount = ethers.utils.parseEther("0.1");
 
-            const tx = await cUSDContract.transfer(receiverAddress, ethers.utils.parseEther("0.1"));
+            if (balance.lt(transferAmount)) {
+                throw new Error("Insufficient balance to transfer.");
+            }
+
+            const tx = await cUSDContract.transfer(receiverAddress, transferAmount).send({
+                gasLimit: 300000,  // Adjust gas limit as needed
+            });
+            
             await provider.waitForTransaction(tx.hash);
 
             setTransactionStatus(`Transaction successful!!`);
