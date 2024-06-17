@@ -23,25 +23,15 @@ export default function TransferCUSD() {
             setUserAddress(accounts[0]);
 
             const provider = new ethers.providers.Web3Provider(ethereum);
-            
+            const signer = provider.getSigner();
 
             const cUSDContract = new ethers.Contract(
                 CUSD_ADDRESS,
-                ["function balanceOf(address account) view returns (uint256)"],
-                provider
+                ["function transfer(address to, uint256 value)"],
+                signer
             );
-            
-            const balance = await cUSDContract.balanceOf(accounts[0]);
-            const transferAmount = ethers.utils.parseEther("0.1");
 
-            if (balance.lt(transferAmount)) {
-                throw new Error("Insufficient balance to transfer."); // Check if user has enough balance
-            }
-
-            const tx = await cUSDContract.transfer(receiverAddress, transferAmount).send({
-                gasLimit: 300000,  // Adjust gas limit as needed
-            });
-            
+            const tx = await cUSDContract.transfer(receiverAddress, ethers.utils.parseEther("0.1"));
             await provider.waitForTransaction(tx.hash);
 
             setTransactionStatus(`Transaction successful!!`);
@@ -66,7 +56,7 @@ export default function TransferCUSD() {
                     borderRadius: "10px",
                     padding: "5px",
                     width: "200px",
-                    border: "2px solid green",
+                    border: "1px solid grey",
                 }}
             />
             <button 
@@ -76,10 +66,7 @@ export default function TransferCUSD() {
                     marginBottom: "10px", 
                     borderRadius: "10px", 
                     border: "1px solid green",
-                    backgroundColor: "green",
-                    color: "white",
-                    padding: "5px",
-                    width: "200px",
+                    color: "green",
                 }}
             >
                 Transfer cUSD
