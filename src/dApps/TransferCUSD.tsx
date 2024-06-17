@@ -35,7 +35,7 @@ export default function TransferCUSD() {
             const transferAmount = ethers.utils.parseEther("0.1");
 
             if (balance.lt(transferAmount)) {
-                throw new Error("Insufficient balance to transfer.");
+                throw new Error("Insufficient balance to transfer."); // Check if user has enough balance
             }
 
             const tx = await cUSDContract.transfer(receiverAddress, transferAmount).send({
